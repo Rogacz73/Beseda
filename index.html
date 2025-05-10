@@ -12,30 +12,39 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      background-color: rgba(255, 255, 255, 0.5);
+      background-color: rgba(255, 255, 255, 0.8);
       background-blend-mode: lighten;
+      transition: background-image 0.5s ease;
     }
     header {
       display: flex;
-      justify-content: space-between;
+      flex-direction: row;
       align-items: center;
+      justify-content: space-between;
       margin-bottom: 1rem;
     }
-    h1 { margin: 0; }
-    #lang-switch { display: flex; gap: 0.5rem; }
+    h1 {
+      margin: 0 auto;
+      text-align: center;
+    }
+    #lang-switch {
+      display: flex;
+      gap: 0.5rem;
+    }
     .lang-btn {
       width: 40px;
       height: 40px;
       border-radius: 50%;
       border: none;
       cursor: pointer;
-      background-size: cover;
+      background-size: 100% 100%;
       background-position: center;
       background-repeat: no-repeat;
       opacity: 1;
     }
     .lang-btn.pl { background-image: url('https://flagcdn.com/pl.svg'); }
     .lang-btn.es { background-image: url('https://flagcdn.com/es.svg'); }
+    .lang-btn.en { background-image: url('https://flagcdn.com/gb.svg'); }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -72,7 +81,8 @@
     input, select { width: 100%; padding: 0.4rem; box-sizing: border-box; }
     .sum-row { font-weight: bold; margin-top: 0.5rem; text-align: right; color: #444; }
     @media (max-width: 600px) {
-      .details { grid-template-columns: 1fr; }
+      header { flex-direction: column; align-items: center; }
+      h1 { margin-bottom: 1rem; }
     }
     .note { font-size: 0.9rem; color: #888; margin-top: 0.25rem; }
   </style>
@@ -83,6 +93,7 @@
     <div id="lang-switch">
       <button class="lang-btn pl" onclick="setLang('pl')" title="Polski"></button>
       <button class="lang-btn es" onclick="setLang('es')" title="Español"></button>
+      <button class="lang-btn en" onclick="setLang('en')" title="English"></button>
     </div>
   </header>
 
@@ -96,39 +107,21 @@
     const text = {
       pl: {
         title: "Kalkulator smyczy Beseda 2025",
-        product: "Produkt", variant: "Wariant", material: "Materiał", option: "Opcja",
-        size: "Szerokość", quantity: "Ilość", unit: "Cena jednostkowa", total: "Suma pozycji",
-        surchargeNote: "(16 € dopłaty technicznej za zamówienie poniżej 100 szt.)",
-        ask: "Zapytaj o ofertę", currency: "PLN",
-        variants: ["Jednostronna", "Dwustronna (+15%)"],
-        materials: ["Standard", "RPET (+10%)", "Satyna (+5%)"],
-        options: ["Karabińczyk", "Bezpiecznik", "Zaczep GSM", "Klamra", "Miarka"],
-        sizes: ["10 mm", "15 mm", "20 mm", "25 mm"],
-        flag: "linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url('https://flagcdn.com/pl.svg')"
+        flag: "linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url('https://flagcdn.com/pl.svg')"
       },
       es: {
         title: "Calculadora de lanyards Beseda 2025",
-        product: "Producto", variant: "Variante", material: "Material", option: "Opción",
-        size: "Anchura", quantity: "Cantidad", unit: "Precio unitario", total: "Total del artículo",
-        surchargeNote: "(16 € de coste técnico por pedido inferior a 100 unidades)",
-        ask: "Consultar precio", currency: "€",
-        variants: ["Una cara", "Dos caras (+15%)"],
-        materials: ["Estándar", "RPET (+10%)", "Satén (+5%)"],
-        options: ["Mosquetón", "Seguro", "Clip GSM", "Cierre", "Regla"],
-        sizes: ["10 mm", "15 mm", "20 mm", "25 mm"],
-        flag: "linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url('https://flagcdn.com/es.svg')"
+        flag: "linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url('https://flagcdn.com/es.svg')"
+      },
+      en: {
+        title: "Beseda 2025 Lanyard Calculator",
+        flag: "linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url('https://flagcdn.com/gb.svg')"
       }
     };
 
     const productData = [
-      { name: { pl: "Smycz sublimowana", es: "Lanyard sublimado" }, image: "img/smycz_sublimowana.jpg" },
-      { name: { pl: "Smycz z klamrą i bezpiecznikiem", es: "Lanyard con cierre y seguro" }, image: "img/smycz_z_klamra_bezpiecznik.jpg" },
-      { name: { pl: "Smycz z wypełnieniem", es: "Lanyard con relleno" }, image: "img/smycz_z_wypelnieniem.jpg" },
-      { name: { pl: "Smycz z wypełnieniem, szeklą i metką", es: "Lanyard con relleno, grillete y etiqueta" }, image: "img/smycz_z_wypelnieniem_szekla_metka.jpg" },
-      { name: { pl: "Smycz krótka z szeklą", es: "Lanyard corto con grillete" }, image: "img/smycz_krotka_szekla.jpg" },
-      { name: { pl: "Smycz krótka naszywana", es: "Lanyard corto cosido" }, image: "img/smycz_krotka_naszywana.jpg" },
-      { name: { pl: "Smycz krótka sznurowadłowa", es: "Lanyard corto tipo cordón" }, image: "img/smycz_krotka_sznurowadlowa.jpg" },
-      { name: { pl: "Smycz podwójna naszywana", es: "Lanyard doble cosido" }, image: "img/smycz_podwojna_naszywana.jpg" }
+      { name: { pl: "Smycz sublimowana", es: "Lanyard sublimado", en: "Sublimated lanyard" }, image: "img/smycz_sublimowana.jpg" },
+      { name: { pl: "Smycz z klamrą i bezpiecznikiem", es: "Lanyard con cierre y seguro", en: "Lanyard with clip and safety" }, image: "img/smycz_z_klamra_bezpiecznik.jpg" }
     ];
 
     const grid = document.getElementById('product-grid');
