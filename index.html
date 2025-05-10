@@ -5,8 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Beseda 2025 - Kalkulator smyczy</title>
   <style>
-    body { font-family: sans-serif; padding: 1rem; background: #f8f8f8; margin: 0; }
-    h1 { text-align: center; margin-bottom: 1rem; }
+    body {
+      font-family: sans-serif;
+      padding: 1rem;
+      margin: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: rgba(255, 255, 255, 0.5);
+      background-blend-mode: lighten;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    h1 { margin: 0; }
+    #lang-switch { display: flex; gap: 0.5rem; }
+    .lang-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 1;
+    }
+    .lang-btn.pl { background-image: url('https://flagcdn.com/pl.svg'); }
+    .lang-btn.es { background-image: url('https://flagcdn.com/es.svg'); }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -45,89 +74,90 @@
     @media (max-width: 600px) {
       .details { grid-template-columns: 1fr; }
     }
+    .note { font-size: 0.9rem; color: #888; margin-top: 0.25rem; }
   </style>
 </head>
 <body>
-  <h1>Kalkulator smyczy Beseda 2025</h1>
+  <header>
+    <h1 id="title"></h1>
+    <div id="lang-switch">
+      <button class="lang-btn pl" onclick="setLang('pl')" title="Polski"></button>
+      <button class="lang-btn es" onclick="setLang('es')" title="Español"></button>
+    </div>
+  </header>
+
   <div class="grid" id="product-grid"></div>
 
   <script>
+    let lang = 'pl';
     const basePrice = 0.52;
+    const euroToPln = 4;
+
+    const text = {
+      pl: {
+        title: "Kalkulator smyczy Beseda 2025",
+        product: "Produkt", variant: "Wariant", material: "Materiał", option: "Opcja",
+        size: "Szerokość", quantity: "Ilość", unit: "Cena jednostkowa", total: "Suma pozycji",
+        surchargeNote: "(16 € dopłaty technicznej za zamówienie poniżej 100 szt.)",
+        ask: "Zapytaj o ofertę", currency: "PLN",
+        variants: ["Jednostronna", "Dwustronna (+15%)"],
+        materials: ["Standard", "RPET (+10%)", "Satyna (+5%)"],
+        options: ["Karabińczyk", "Bezpiecznik", "Zaczep GSM", "Klamra", "Miarka"],
+        sizes: ["10 mm", "15 mm", "20 mm", "25 mm"],
+        flag: "linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url('https://flagcdn.com/pl.svg')"
+      },
+      es: {
+        title: "Calculadora de lanyards Beseda 2025",
+        product: "Producto", variant: "Variante", material: "Material", option: "Opción",
+        size: "Anchura", quantity: "Cantidad", unit: "Precio unitario", total: "Total del artículo",
+        surchargeNote: "(16 € de coste técnico por pedido inferior a 100 unidades)",
+        ask: "Consultar precio", currency: "€",
+        variants: ["Una cara", "Dos caras (+15%)"],
+        materials: ["Estándar", "RPET (+10%)", "Satén (+5%)"],
+        options: ["Mosquetón", "Seguro", "Clip GSM", "Cierre", "Regla"],
+        sizes: ["10 mm", "15 mm", "20 mm", "25 mm"],
+        flag: "linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url('https://flagcdn.com/es.svg')"
+      }
+    };
+
     const productData = [
-      { name: "Smycz sublimowana", image: "img/smycz_sublimowana.jpg" },
-      { name: "Smycz z klamrą i bezpiecznikiem", image: "img/smycz_z_klamra_bezpiecznik.jpg" },
-      { name: "Smycz z wypełnieniem", image: "img/smycz_z_wypelnieniem.jpg" },
-      { name: "Smycz z wypełnieniem, szeklą i metką", image: "img/smycz_z_wypelnieniem_szekla_metka.jpg" },
-      { name: "Smycz krótka z szeklą", image: "img/smycz_krotka_szekla.jpg" },
-      { name: "Smycz krótka naszywana", image: "img/smycz_krotka_naszywana.jpg" },
-      { name: "Smycz krótka sznurowadłowa", image: "img/smycz_krotka_sznurowadlowa.jpg" },
-      { name: "Smycz podwójna naszywana", image: "img/smycz_podwojna_naszywana.jpg" }
+      { name: { pl: "Smycz sublimowana", es: "Lanyard sublimado" }, image: "img/smycz_sublimowana.jpg" },
+      { name: { pl: "Smycz z klamrą i bezpiecznikiem", es: "Lanyard con cierre y seguro" }, image: "img/smycz_z_klamra_bezpiecznik.jpg" },
+      { name: { pl: "Smycz z wypełnieniem", es: "Lanyard con relleno" }, image: "img/smycz_z_wypelnieniem.jpg" },
+      { name: { pl: "Smycz z wypełnieniem, szeklą i metką", es: "Lanyard con relleno, grillete y etiqueta" }, image: "img/smycz_z_wypelnieniem_szekla_metka.jpg" },
+      { name: { pl: "Smycz krótka z szeklą", es: "Lanyard corto con grillete" }, image: "img/smycz_krotka_szekla.jpg" },
+      { name: { pl: "Smycz krótka naszywana", es: "Lanyard corto cosido" }, image: "img/smycz_krotka_naszywana.jpg" },
+      { name: { pl: "Smycz krótka sznurowadłowa", es: "Lanyard corto tipo cordón" }, image: "img/smycz_krotka_sznurowadlowa.jpg" },
+      { name: { pl: "Smycz podwójna naszywana", es: "Lanyard doble cosido" }, image: "img/smycz_podwojna_naszywana.jpg" }
     ];
 
     const grid = document.getElementById('product-grid');
 
+    function setLang(l) {
+      lang = l;
+      document.getElementById('title').textContent = text[lang].title;
+      document.body.style.backgroundImage = text[lang].flag;
+      grid.innerHTML = '';
+      productData.forEach(createCard);
+    }
+
     function createCard(product) {
       const card = document.createElement('div');
       card.className = 'card';
-      card.innerHTML = `
-        <img src="${product.image}" alt="${product.name}" onclick="toggleDetails(this)">
-        <div class="details">
-          <table>
-            <tr><th>Produkt</th><td>${product.name}</td></tr>
-            <tr><th>Wariant</th><td><select class="variant"><option value="1">Jednostronna</option><option value="1.15">Dwustronna (+15%)</option></select></td></tr>
-            <tr><th>Materiał</th><td><select class="material"><option value="1">Standard</option><option value="1.10">RPET (+10%)</option><option value="1.05">Satyna (+5%)</option></select></td></tr>
-            <tr><th>Opcje</th><td><select class="options" multiple><option value="0.10">Bezpiecznik</option><option value="0.10">Zaczep GSM</option><option value="0.10">Klamra</option><option value="0.20">Miarka</option></select></td></tr>
-            <tr><th>Szerokość</th><td><select class="size"><option value="0.827">10 mm</option><option value="0.942">15 mm</option><option value="1">20 mm</option><option value="1.135">25 mm</option></select></td></tr>
-            <tr><th>Ilość</th><td><input type="number" class="quantity" value="100" min="1"></td></tr>
-            <tr><th>Cena jednostkowa</th><td class="price">—</td></tr>
-            <tr><th>Suma pozycji</th><td class="subtotal">—</td></tr>
-          </table>
-        </div>`;
+
+      const img = document.createElement('img');
+      img.src = product.image;
+      img.alt = product.name[lang];
+      card.appendChild(img);
+
+      const title = document.createElement('h3');
+      title.textContent = product.name[lang] || product.name['pl'];
+      card.appendChild(title);
+
       grid.appendChild(card);
     }
 
-    function toggleDetails(img) {
-      const card = img.closest('.card');
-      const details = card.querySelector('.details');
-      const isOpen = details.style.display === 'grid';
-      document.querySelectorAll('.details').forEach(el => el.style.display = 'none');
-      document.querySelectorAll('.card').forEach(el => el.classList.remove('expanded'));
-      if (!isOpen) {
-        details.style.display = 'grid';
-        card.classList.add('expanded');
-      }
-    }
-
-    function calculateAll() {
-      document.querySelectorAll('.card').forEach(card => {
-        const variant = parseFloat(card.querySelector('.variant').value);
-        const material = parseFloat(card.querySelector('.material').value);
-        const size = parseFloat(card.querySelector('.size').value);
-        const qty = parseInt(card.querySelector('.quantity').value);
-        let optionFactor = 0;
-        card.querySelectorAll('.options option:checked').forEach(opt => {
-          optionFactor += parseFloat(opt.value);
-        });
-
-        if (qty > 10000) {
-          card.querySelector('.subtotal').textContent = 'Zapytaj o ofertę';
-          card.querySelector('.price').textContent = '—';
-          return;
-        }
-
-        const surcharge = qty < 100 ? 16 : 0;
-        const unitPrice = basePrice * variant * material * size * (1 + optionFactor);
-        const total = unitPrice * qty + surcharge;
-        const finalUnit = total / qty;
-
-        card.querySelector('.price').textContent = finalUnit.toFixed(2) + ' €';
-        card.querySelector('.subtotal').textContent = total.toFixed(2) + ' €';
-      });
-    }
-
-    productData.forEach(createCard);
-    document.addEventListener('input', calculateAll);
-    calculateAll();
+    window.onload = () => setLang(lang);
   </script>
 </body>
 </html>
