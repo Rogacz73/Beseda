@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Kalkulator wagi smyczy</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    label, select, input { display: block; margin: 10px 0; font-size: 16px; }
+    .result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Kalkulator wagi smyczy reklamowych</h2>
+
+  <label for="width">Szerokość smyczy (mm):</label>
+  <select id="width">
+    <option value="10">10 mm</option>
+    <option value="15">15 mm</option>
+    <option value="20" selected>20 mm</option>
+    <option value="25">25 mm</option>
+  </select>
+
+  <label for="accessory">Akcesoria:</label>
+  <select id="accessory">
+    <option value="rybka">Rybka</option>
+    <option value="rybka_klamerka">Rybka + klamerka</option>
+    <option value="rybka_bezpiecznik">Rybka + bezpiecznik</option>
+  </select>
+
+  <label for="quantity">Ilość sztuk:</label>
+  <input type="number" id="quantity" value="500">
+
+  <button onclick="calculateWeight()">Oblicz wagę</button>
+
+  <div class="result" id="output"></div>
+
+  <script>
+    const weights = {
+      "10": { rybka: 0.010, rybka_klamerka: 0.011, rybka_bezpiecznik: 0.011 },
+      "15": { rybka: 0.012, rybka_klamerka: 0.015, rybka_bezpiecznik: 0.014 },
+      "20": { rybka: 0.016, rybka_klamerka: 0.020, rybka_bezpiecznik: 0.018 },
+      "25": { rybka: 0.018, rybka_klamerka: 0.024, rybka_bezpiecznik: 0.022 }
+    };
+
+    function calculateWeight() {
+      const width = document.getElementById("width").value;
+      const accessory = document.getElementById("accessory").value;
+      const quantity = parseInt(document.getElementById("quantity").value);
+      const weightPerItem = weights[width][accessory];
+      const totalWeight = (weightPerItem * quantity).toFixed(2);
+
+      document.getElementById("output").innerText = `Szacunkowa waga: ${totalWeight} kg`;
+    }
+  </script>
+</body>
+</html>
